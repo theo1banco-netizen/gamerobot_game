@@ -17,7 +17,7 @@ GROUPS = [
 
 PARTNER_GROUPS = [
     "https://t.me/linkkiemtienmoney",
-    "https://t.me/et88_sangame_bot?start=8936805776",
+    "https://t.me/chiasekeokitienD",
     "https://t.me/combo_today",
     "https://t.me/kiemtientelefree"
 ]
