@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN — Robo Robo</title>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif;}
+        body {background:#1a1a2e; color:#fff; padding:20px; max-width:900px; margin:0 auto;}
+        .khoi {background:#16213e; padding:15px; margin:15px 0; border-radius:10px; border-left:4px solid #9945ff;}
+        h2 {color:#9945ff; margin-bottom:10px;}
+        h3 {color:#00ff88; margin:8px 0;}
+        .nut {background:linear-gradient(135deg,#9945ff,#6b2ed8); border:none; padding:10px 15px; color:#fff; border-radius:6px; cursor:pointer; margin:3px;}
+        .nut-xanh {background:linear-gradient(135deg,#00ff88,#00b35c);}
+        .nut-do {background:linear-gradient(135deg,#ff4444,#cc0000);}
+        .nut-vang {background:linear-gradient(135deg,#ffd700,#cc9900);}
+        input, textarea {padding:8px; width:100%; margin:5px 0; border-radius:5px; border:none; background:#0f0f23; color:#fff;}
+        .dong {padding:8px 0; border-bottom:1px solid #333;}
+        .an {display:none;}
+        .thongbao {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#222; padding:25px; border-radius:10px; border:2px solid #9945ff; z-index:999; display:none;}
+        .dang-nhap {text-align:center; padding-top:80px;}
+        .token-box {background:#0f0f23; padding:10px; border-radius:6px; border:1px dashed #9945ff; margin:8px 0;}
+        .canhbao {color:#ffd700; font-size:12px; margin-top:4px;}
+    </style>
+</head>
+<body>
+
+<!-- MÀN HÌNH CẤU HÌNH TOKEN & ĐĂNG NHẬP -->
+<div class="dang-nhap" id="man_dangnhap">
+    <h1>🔐 QUẢN LÝ ADMIN — ROBO ROBO</h1>
+    
+    <div class="token-box">
+        <h3>🔑 CẤU HÌNH KẾT NỐI</h3>
+        <p class="canhbao">⚠️ Giữ kín — không chia cho ai!</p>
+        
+        <label>Token Bot Telegram:</label>
+        <input type="text" id="TOKEN_BOT" placeholder="Nhập token từ @BotFather...">
+        
+        <label>Token Mini App / Game:</label>
+        <input type="text" id="TOKEN_GAME" placeholder="Khóa bảo mật game...">
+        
+        <label>ID Telegram Admin chính:</label>
+        <input type="text" id="ID_ADMIN" placeholder="ID của bạn">
+        
+        <label>Mật khẩu đăng nhập:</label>
+        <input type="password" id="MATKHAU" placeholder="Đặt mật khẩu riêng">
+        
+        <button class="nut" onclick="luuCauHinh()">💾 Lưu Cấu Hình</button>
+    </div>
+    
+    <button class="nut nut-xanh" onclick="dangNhap()">🔓 Đăng Nhập</button>
+</div>
+
+<!-- NỘI DUNG QUẢN LÝ SAU KHI ĐĂNG NHẬP -->
+<div id="noi_dung" class="an">
+    <h1 style="text-align:center; color:#9945ff; margin-bottom:10px;">🔧 BẢNG ĐIỀU HÀNH ADMIN</h1>
+    
+    <div class="token-box" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>✅ Đã kết nối Bot: <strong id="ten_bot">---</strong></span>
+        <button class="nut nut-nho" onclick="dangXuat()">Đăng xuất</button>
+    </div>
+
+    <!-- 1. TẠO MÃ THƯỞNG -->
+    <div class="khoi">
+        <h2>🔑 TẠO MÃ THƯỞNG (8-9 ký tự)</h2>
+        <input type="number" id="ma_xu" placeholder="Số Xu mỗi mã">
+        <input type="number" id="ma_so" placeholder="Số lượng mã tạo">
+        <button class="nut nut-xanh" onclick="taoMa()">✅ TẠO MÃ</button>
+        <div id="danhsach_ma" style="margin-top:10px; padding:10px; background:#0f0f23; border-radius:6px;"></div>
+        <button class="nut nut-do" onclick="xoaTatCaMa()">🗑️ Xóa tất cả mã</button>
+    </div>
+
+    <!-- 2. QUẢN LÝ NGƯỜI CHƠI -->
+    <div class="khoi">
+        <h2>👥 QUẢN LÝ NGƯỜI CHƠI</h2>
+        <input type="text" id="nguoi_id" placeholder="ID Telegram người chơi">
+        <button class="nut" onclick="xemThongTin()">🔍 Xem thông tin</button>
+        <div id="thongtin_nguoi" style="margin:10px 0; padding:10px; background:#0f0f23; border-radius:6px;"></div>
+        
+        <h3>⚙️ Điều chỉnh tài khoản</h3>
+        <input type="number" id="so_xu" placeholder="Số Xu">
+        <button class="nut nut-xanh" onclick="congXu()">+ Cộng Xu</button>
+        <button class="nut nut-do" onclick="truXu()">- Trừ Xu</button>
+        <button class="nut nut-vang" onclick="datXu()">= Đặt Xu chính xác</button>
+        
+        <input type="number" id="so_kc" placeholder="Số Kim cương">
+        <button class="nut nut-xanh" onclick="congKC()">+ Cộng KC</button>
+        <button class="nut nut-do" onclick="truKC()">- Trừ KC</button>
+    </div>
+
+    <!-- 3. DUYỆT RÚT TIỀN + GỬI THÔNG BÁO VỀ BOT -->
+    <div class="khoi">
+        <h2>💰 DUYỆT RÚT TIỀN</h2>
+        <button class="nut" onclick="taiDonRut()">🔄 Tải lại danh sách</button>
+        <div id="danhsach_donrut" style="margin-top:10px;"></div>
+        <p class="canhbao">✅ Khi duyệt → tự gửi tin nhắn về Bot cho người chơi</p>
+    </div>
+
+    <!-- 4. GỬI THÔNG BÁO QUA BOT -->
+    <div class="khoi">
+        <h2>📢 GỬI THÔNG BÁO QUA BOT</h2>
+        <textarea id="noi_dung_tb" rows="3" placeholder="Nội dung gửi cho tất cả người chơi..."></textarea>
+        <button class="nut nut-xanh" onclick="guiThongBao()">📤 Gửi tất cả</button>
+    </div>
+
+    <!-- 5. THỐNG KÊ -->
+    <div class="khoi">
+        <h2>📊 THỐNG KÊ HỆ THỐNG</h2>
+        <button class="nut" onclick="taiThongKe()">Xem số liệu</button>
+        <div id="thongke"></div>
+    </div>
+</div>
+
+<!-- THÔNG BÁO HỆ THỐNG -->
+<div class="thongbao" id="tb">
+    <p id="tb_nd"></p>
+    <button class="nut" onclick="dongTb()">Đóng</button>
+</div>
+
+<script>
+const VPS_URL = "http://103.173.226.133/api.php";
+
+// === BIẾN TOÀN CỤ ===
+let TOKEN_BOT = '';
+let TOKEN_GAME = '';
+let ID_ADMIN_CHINH = '';
+let MATKHAU_DUNG = '';
+let duLieu = {};
+
+// === TẢI CẤU HÌNH ĐÃ LƯU ===
+function taiCauHinh() {
+    const cauhinh = localStorage.getItem('admin_cauhinh');
+    if(cauhinh) {
+        const c = JSON.parse(cauhinh);
+        document.getElementById('TOKEN_BOT').value = c.token_bot || '';
+        document.getElementById('TOKEN_GAME').value = c.token_game || '';
+        document.getElementById('ID_ADMIN').value = c.id_admin || '';
+        document.getElementById('MATKHAU').value = c.matkhau || '';
+    }
+    duLieu = JSON.parse(localStorage.getItem('admin_robo') || '{"ma_thuong":[],"nguoi_choi":{},"don_rut":[]}');
+}
+
+// === LƯU CẤU HÌNH ===
+function luuCauHinh() {
+    TOKEN_BOT = document.getElementById('TOKEN_BOT').value.trim();
+    TOKEN_GAME = document.getElementById('TOKEN_GAME').value.trim();
+    ID_ADMIN_CHINH = document.getElementById('ID_ADMIN').value.trim();
+    MATKHAU_DUNG = document.getElementById('MATKHAU').value.trim();
+    
+    if(!TOKEN_BOT || !ID_ADMIN_CHINH || !MATKHAU_DUNG) {
+        return tb('❌ Điền đầy đủ Token Bot + ID Admin + Mật khẩu!');
+    }
+    
+    localStorage.setItem('admin_cauhinh', JSON.stringify({
+        token_bot: TOKEN_BOT,
+        token_game: TOKEN_GAME,
+        id_admin: ID_ADMIN_CHINH,
+        matkhau: MATKHAU_DUNG
+    }));
+    
+    tb('✅ Đã lưu cấu hình! Sẵn sàng kết nối Bot');
+}
+
+// === ĐĂNG NHẬP ===
+function dangNhap() {
+    TOKEN_BOT = document.getElementById('TOKEN_BOT').value.trim();
+    TOKEN_GAME = document.getElementById('TOKEN_GAME').value.trim();
+    ID_ADMIN_CHINH = document.getElementById('ID_ADMIN').value.trim();
+    MATKHAU_DUNG = document.getElementById('MATKHAU').value.trim();
+    
+    if(!TOKEN_BOT || !ID_ADMIN_CHINH || !MATKHAU_DUNG) {
+        return tb('❌ Nhấn Lưu Cấu Hình trước!');
+    }
+    
+    // Kiểm tra đúng Admin
+    if(ID_ADMIN_CHINH && MATKHAU_DUNG) {
+        document.getElementById('man_dangnhap').classList.add('an');
+        document.getElementById('noi_dung').classList.remove('an');
+        document.getElementById('ten_bot').innerText = TOKEN_BOT.substring(0,12) + '...';
+        tb('✅ Đăng nhập thành công! Đã kết nối Bot');
+        taiDonRut();
+        taiThongKe();
+    } else {
+        tb('❌ Sai thông tin! Kiểm tra lại');
+    }
+}
+
+// === ĐĂNG XUẤT ===
+function dangXuat() {
+    document.getElementById('noi_dung').classList.add('an');
+    document.getElementById('man_dangnhap').classList.remove('an');
+    tb('✅ Đã đăng xuất');
+}
+
+// === GỬI TIN NHẮN ĐẾN BOT TELEGRAM ===
+async function guiTinNhanTelegram(idNhan, noiDung) {
+    if(!TOKEN_BOT) return false;
+    const url = `https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`;
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chat_id: idNhan,
+                text: noiDung,
+                parse_mode: 'HTML'
+            })
+        });
+        return true;
+    } catch(e) {
+        console.log('Lỗi gửi tin nhắn:', e);
+        return false;
+    }
+}
+
+// === LƯU DỮ LIỆU ===
+function luu() {
+    localStorage.setItem('admin_robo', JSON.stringify(duLieu));
+}
+
+// === TẠO MÃ 8-9 KÝ TỰ ===
+function taoMaNgauNhien() {
+    const chu = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let ma = 'ROBO';
+    const doDai = 4 + Math.floor(Math.random()*2);
+    for(let i=0; i<doDai; i++) {
+        ma += chu[Math.floor(Math.random()*chu.length)];
+    }
+    return ma;
+}
+
+function taoMa() {
+    const soXu = parseInt(document.getElementById('ma_xu').value);
+    const soLuong = parseInt(document.getElementById('ma_so').value);
+    
+    if(!soXu || !soLuong) return tb('❌ Điền đầy đủ thông tin!');
+    
+    const kq = [];
+    for(let i=0; i<soLuong; i++) {
+        const ma = taoMaNgauNhien();
+        duLieu.ma_thuong.push({
+            ma: ma,
+            xu: soXu,
+            da_dung: false,
+            thoi_gian: new Date().toLocaleString('vi-VN')
+        });
+        kq.push(ma);
+    }
+    
+    document.getElementById('danhsach_ma').innerHTML = `
+        <p style="color:#00ff88;">✅ Đã tạo ${soLuong} mã:</p>
+        <p style="margin-top:5px; word-break:break-all; font-size:14px;">${kq.join(' | ')}</p>
+        <p class="canhbao">Copy gửi cho người chơi nhập vào game</p>
+    `;
+    luu();
+    tb(`✅ Tạo thành công ${soLuong} mã!`);
+}
+
+function xoaTatCaMa() {
+    if(confirm('Chắc chắn xóa hết mã?')) {
+        duLieu.ma_thuong = [];
+        document.getElementById('danhsach_ma').innerHTML = '<p>Đã xóa hết mã</p>';
+        luu();
+        tb('✅ Đã xóa tất cả mã!');
+    }
+}
+
+// === QUẢN LÝ NGƯỜI CHƠI ===
+function xemThongTin() {
+    const id = document.getElementById('nguoi_id').value.trim();
+    if(!id) return tb('❌ Nhập ID người chơi!');
+    
+    const nguoi = duLieu.nguoi_choi[id] || {xu:0, kimcuong:0, ten:'Chưa có dữ liệu'};
+    document.getElementById('thongtin_nguoi').innerHTML = `
+        <p><strong>ID Telegram:</strong> ${id}</p>
+        <p><strong>Tên:</strong> ${nguoi.ten || 'Chưa cập nhật'}</p>
+        <p><strong>💰 Xu:</strong> ${(nguoi.xu||0).toLocaleString()}</p>
+        <p><strong>💎 Kim cương:</strong> ${nguoi.kimcuong||0}</p>
+        <p><strong>👥 Đã mời:</strong> ${nguoi.da_moi||0} người</p>
+    `;
+}
+
+function congXu() {
+    const id = document.getElementById('nguoi_id').value.trim();
+    const so = parseInt(document.getElementById('so_xu').value);
+    if(!id || !so) return tb('❌ Nhập đủ thông tin!');
+    if(!duLieu.nguoi_choi[id]) duLieu.nguoi_choi[id] = {xu:0, kimcuong:0};
+    duLieu.nguoi_choi[id].xu += so;
+    luu(); tb(`✅ Cộng ${so.toLocaleString()} Xu thành công!`); xemThongTin();
+}
+
+function truXu() {
+    const id = document.getElementById('nguoi_id').value.trim();
+    const so = parseInt(document.getElementById('so_xu').value);
+    if(!id || !so) return tb('❌ Nhập đủ thông tin!');
+    if(!duLieu.nguoi_choi[id]) duLieu.nguoi_choi[id] = {xu:0, kimcuong:0};
+    duLieu.nguoi_choi[id].xu = Math.max(0, duLieu.nguoi_choi[id].xu - so);
+    luu(); tb(`✅ Trừ ${so.toLocaleString()} Xu thành công!`); xemThongTin();
+}
+
+function datXu() {
+    const id = document.getElementById('nguoi_id').value.trim();
+    const so = parseInt(document.getElementById('so_xu').value);
+    if(!id || isNaN(so)) return tb('❌ Nhập đủ thông tin!');
+    if(!duLieu.nguoi_choi[id]) duLieu.nguoi_choi[id] = {xu:0, kimcuong:0};
+    duLieu.nguoi_choi[id].xu = so;
+    luu(); tb(`✅ Đặt thành ${so.toLocaleString()} Xu!`); xemThongTin();
+}
+
+function congKC() {
+    const id = document.getElementById('nguoi_id').value.trim();
+    const so = parseInt(document.getElementById('so_kc').value);
+    if(!id || !so) return tb('❌ Nhập đủ thông tin!');
+    if(!duLieu.nguoi_choi[id]) duLieu.nguoi_choi[id] = {xu:0, kimcuong:0};
+    duLieu.nguoi_choi[id].kimcuong += so;
+    luu(); tb(`✅ Cộng ${so} 💎 thành công!`); xemThongTin();
+}
+
+function truKC() {
+    const id = document.getElementById('nguoi_id').value.trim();
+    const so = parseInt(document.getElementById('so_kc').value);
+    if(!id || !so) return tb('❌ Nhập đủ thông tin!');
+    if(!duLieu.nguoi_choi[id]) duLieu.nguoi_choi[id] = {xu:0, kimcuong:0};
+    duLieu.nguoi_choi[id].kimcuong = Math.max(0, duLieu.nguoi_choi[id].kimcuong - so);
+    luu(); tb(`✅ Trừ ${so} 💎 thành công!`); xemThongTin();
+}
+
+// === DUYỆT ĐƠN RÚT TIỀN ===
+function taiDonRut() {
+    const kq = document.getElementById('danhsach_donrut');
+    if(!duLieu.don_rut || duLieu.don_rut.length === 0) {
+        kq.innerHTML = '<p style="color:#888;">Không có đơn rút tiền nào chờ duyệt</p>';
+        return;
+    }
+    
+    kq.innerHTML = duLieu.don_rut.map((d, i) => `
+        <div style="border:1px solid #444; padding:12px; margin:8px 0; border-radius:6px;">
+            <p><strong>ID Người chơi:</strong> ${d.id_nguoi}</p>
+            <p><strong>Tên TK:</strong> ${d.ten}</p>
+            <p><strong>Ngân hàng:</strong> ${d.nganhang} — ${d.sotk}</p>
+            <p><strong>Số lượng:</strong> ${d.kc} 💎 = ${(d.kc/100*5000).toLocaleString()} VNĐ</p>
+            <p><strong>Thời gian:</strong> ${d.thoi_gian}</p>
+            <p><strong>Trạng thái:</strong> <span style="color:${d.trangthai==='chờ'?'orange':d.trangthai==='đồng ý'?'green':'red'}">${d.trangthai}</span></p>
+            ${d.trangthai==='chờ'?`
+                <button class="nut nut-xanh" onclick="dongY(${i})">✅ Đồng ý & Gửi thông báo</button>
+                <button class="nut nut-do" onclick="tuChoi(${i})">❌ Từ chối & Hoàn trả</button>
+            `:''}
+        </div>
+    `).join('');
+}
+
+async function dongY(i) {
+    const d = duLieu.don_rut[i];
+    d.trangthai = 'đồng ý';
+    luu();
+    
+    // Gửi thông báo về Bot cho người chơi
+    const tin = `✅ <b>Yêu cầu rút tiền đã được duyệt!</b>
+
+💎 Số lượng: ${d.kc}
+💰 Thành tiền: ${(d.kc/100*5000).toLocaleString()} VNĐ
+🏦 Tài khoản: ${d.nganhang} - ${d.ten}
+📝 Số TK: ${d.sotk}
+
+Vui lòng kiểm tra tài khoản trong vòng vài phút.
+Cảm ơn bạn đã chơi! 🤖`;
+    
+    await guiTinNhanTelegram(d.id_nguoi, tin);
+    tb('✅ Đã duyệt + gửi thông báo cho người chơi!');
+    taiDonRut();
+}
+
+async function tuChoi(i) {
+    const d = duLieu.don_rut[i];
+    const idNguoi = d.id_nguoi;
+    const kc = d.kc;
+    
+    // Trả kim cương lại
+    if(!duLieu.nguoi_choi[idNguoi]) duLieu.nguoi_choi[idNguoi] = {xu:0, kimcuong:0};
+    duLieu.nguoi_choi[idNguoi].kimcuong += kc;
+    d.trangthai = 'từ chối';
+    luu();
+    
+    // Gửi thông báo
+    const tin = `❌ <b>Yêu cầu rút tiền bị từ chối</b>
+
+💎 Số lượng: ${kc} đã hoàn trả về tài khoản của bạn.
+Lý do: Thông tin tài khoản không chính xác hoặc không hợp lệ.
+Vui lòng kiểm tra lại và gửi yêu cầu mới!`;
+    
+    await guiTinNhanTelegram(idNguoi, tin);
+    tb(`❌ Đã từ chối! Hoàn trả ${kc} 💎 + thông báo cho người chơi`);
+    taiDonRut();
+}
+
+// === GỬI THÔNG BÁO TẤT CẢ ===
+async function guiThongBao() {
+    const nd = document.getElementById('noi_dung_tb').value.trim();
+    if(!nd) return tb('❌ Nhập nội dung thông báo!');
+    
+    const tatCaId = Object.keys(duLieu.nguoi_choi);
+    if(tatCaId.length === 0) return tb('Chưa có người chơi nào!');
+    
+    let dem = 0;
+    for(const id of tatCaId) {
+        const ok = await guiTinNhanTelegram(id, `📢 <b>Thông báo từ Admin</b>\n\n${nd}`);
+        if(ok) dem++;
+    }
+    
+    tb(`✅ Đã gửi cho ${dem}/${tatCaId.length} người chơi!`);
+    document.getElementById('noi_dung_tb').value = '';
+}
+
+// === THỐNG KÊ ===
+function taiThongKe() {
+    const tongNguoi = Object.keys(duLieu.nguoi_choi).length;
+    const tongMa = duLieu.ma_thuong ? duLieu.ma_thuong.length : 0;
+    const maChuaDung = duLieu.ma_thuong ? duLieu.ma_thuong.filter(m=>!m.da_dung).length : 0;
+    const donCho = duLieu.don_rut ? duLieu.don_rut.filter(d=>d.trangthai==='chờ').length : 0;
+    
+    document.getElementById('thongke').innerHTML = `
+        <div style="padding:15px; background:#0f0f23; border-radius:6px; margin-top:8px;">
+            <p>👥 Tổng người chơi: <strong>${tongNguoi}</strong></p>
+            <p>🔑 Tổng mã đã tạo: <strong>${tongMa}</strong></p>
+            <p>✅ Mã chưa dùng: <strong>${maChuaDung}</strong></p>
+            <p>💰 Đơn rút chờ duyệt: <strong>${donCho}</strong></p>
+            <p>🤖 Kết nối Bot: <strong style="color:#00ff88;">Đang hoạt động</strong></p>
+        </div>
+    `;
+}
+
+// === THÔNG BÁO ===
+function tb(nd) {
+    document.getElementById('tb_nd').innerText = nd;
+    document.getElementById('tb').style.display = 'block';
+}
+function dongTb() {
+    document.getElementById('tb').style.display = 'none';
+}
+
+// === KHỞI TẠO ===
+window.onload = taiCauHinh;
+</script>
+</body>
+</html>
